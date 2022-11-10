@@ -1,2 +1,2 @@
-# maze_searching
-A maze searching for comit
+# Snake Game
+Make a snake game for Comit site's minigame.

@@ -25,7 +25,6 @@ let wallColor = "#000000"
 let foodColor = "#dc143c"
 
 
-
 // Set keyboard
 document.onkeydown = keyDownEventHandler
 function keyDownEventHandler(c) {
@@ -40,7 +39,7 @@ function keyDownEventHandler(c) {
     }
 }
 
-// Control keyboard
+// Set move
 function move(direction) {
     switch (direction) {
         case 0:
@@ -58,13 +57,20 @@ function move(direction) {
         default:
             return
     }
-    // 충돌할 경우 gameover
+    if(invalidMove(y, x)) gameover()
+    snake(y, x)
 }
 
 // Init board
 function init() {
     board()
-
+    wall()
+    y = parseInt(height/2)
+    x = parseInt(width/2)
+    snake(y, x)
+    direction = -1
+    speed=50
+    keepMove = setInterval("move(direction)", speed)
 }
 
 // Make board
@@ -83,21 +89,66 @@ function board() {
 
 // Make wall
 function wall() {
-    let
+    let well = new Array()
+    for(let i=0; i<height; i++) wall.push(new Array(i, 0))
+    for(let i=0; i<height; i++) wall.push(new Array(i, width-1))
+    for(let i=0; i<width; i++) wall.push(new Array(0, i))
+    for(let i=0; i<width; i++) wall.push(new Array(height-1, i))
+
+    for(let i=0; i<wall.length; i++) {
+        let wy = wall[i][0]
+        let wx = wall[i][1]
+        document.getElementById(String(wy) + " " + String(wx)).style.background = wallColor
+        document.getElementById(String(wy) + " " + String(wx)).style.borderRadius = "1.5px"
+    }
 }
 
 // Set snake
-function snake() {
+function snake(y, x) {
+    snakeQueue.push(new Array(y, x))
+    document.getElementById(String(y) + " " + String(x)).style.background = snakeColor
+}
 
+function removeSnake() {
+    let ty = snakeQueue[0][0]
+    let tx = snakeQueue[0][1]
+    snakeQueue.shift()
+    document.getElementById(String(ty) + " " + String(tx)).style.background = tileColor
 }
 
 // Set food
 function food() {
+    do {
+        let rand = parseInt(Math,random() * ((height - 2) * (width - 2)))
+        fy = parseInt(rand/(height - 2)) + 1
+        fx = rand % (width - 2) + 1
+    } while(isInQueue(fy, fx))
+    document.getElementById(String(fy) + " " + String(fx)).style.background = foodColor
+    document.getElementById(String(fy) + " " + String(fx)).style.background = "6px"
+}
 
+// Set collision
+function invalidMove(y, x) {
+    return (y==0||y==height-1||x==0||x==width-1) || collision(y, x)
+}
+
+function collision() {
+    if (isInQueue(y, x)) return true
+    return false
+}
+
+function isInQueue(y, x) {
+    let p = new Array(y, x)
+    for(let i=0; i<snakeQueue.length; i++) {
+        if(snakeQueue[i][0] == p[0] && snakeQueue[i][1] == p[1])
+            return true
+    }
+    return false
 }
 
 // Game over
 function gameover() {
     alert("Game Over")
     init()
+    location.reload()
 }
